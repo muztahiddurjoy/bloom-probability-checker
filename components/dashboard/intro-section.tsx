@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Sparkles, Map, BarChart3, Search, Globe } from "lucide-react";
 import SearchContainer from "./search-container";
+import Link from "next/link";
 
 export function IntroSection() {
   return (
@@ -28,18 +29,17 @@ export function IntroSection() {
           </div>
 
           <div className="flex flex-wrap gap-3 pt-4">
-            <Button className="bg-lime-500 hover:bg-lime-600 text-green-900 font-semibold shadow-lg">
+            <Link
+              href="/map"
+              className={buttonVariants({
+                className:
+                  "bg-lime-500 hover:bg-lime-600 text-green-900 font-semibold shadow-lg",
+              })}
+            >
               <Map className="w-4 h-4 mr-2" />
               Explore Map
-            </Button>
+            </Link>
             <SearchContainer />
-            <Button
-              variant="outline"
-              className="bg-white/10 hover:bg-white/20 text-white border-white/30 font-semibold backdrop-blur-sm"
-            >
-              <Globe className="w-4 h-4 mr-2" />
-              Global View
-            </Button>
           </div>
         </div>
       </Card>
