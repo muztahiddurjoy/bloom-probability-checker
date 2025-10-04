@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Map, BarChart3, Search, Globe } from "lucide-react";
+import SearchContainer from "./search-container";
 
 export function IntroSection() {
   return (
@@ -31,14 +32,7 @@ export function IntroSection() {
               <Map className="w-4 h-4 mr-2" />
               Explore Map
             </Button>
-
-            <Button
-              variant="outline"
-              className="bg-white/10 hover:bg-white/20 text-white border-white/30 font-semibold backdrop-blur-sm"
-            >
-              <Search className="w-4 h-4 mr-2" />
-              Search Flowers
-            </Button>
+            <SearchContainer />
             <Button
               variant="outline"
               className="bg-white/10 hover:bg-white/20 text-white border-white/30 font-semibold backdrop-blur-sm"
