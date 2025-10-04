@@ -1,5 +1,5 @@
 "use client";
-import { LatLng } from "@/app/page";
+import { LatLng } from "@/app/map/page";
 import React, { useEffect, useState } from "react";
 import { useMap, useMapEvents, Marker, Popup } from "react-leaflet";
 import { Button } from "./ui/button";

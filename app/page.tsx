@@ -1,70 +1,31 @@
-"use client";
-import MainContainer from "@/components/main-container";
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
+import { MapPreview } from "@/components/dashboard/map-preview"
+import { IntroSection } from "@/components/dashboard/intro-section"
+import { Flower2 } from "lucide-react"
 
-export interface LatLng {
-  lat: number;
-  lng: number;
-}
-
-export default function Home() {
-  const mapRef = useRef(null);
-  const [center, setCenter] = useState<[number, number]>([51.505, -0.09]); // Default center
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const lastLat = localStorage.getItem("lastLat");
-        const lastLng = localStorage.getItem("lastLng");
-
-        if (lastLat && lastLng) {
-          const lat = Number(lastLat);
-          const lng = Number(lastLng);
-
-          if (
-            !isNaN(lat) &&
-            !isNaN(lng) &&
-            lat >= -90 &&
-            lat <= 90 &&
-            lng >= -180 &&
-            lng <= 180
-          ) {
-            setCenter([lat, lng]);
-          }
-        }
-      } catch (error) {
-        console.error("Error reading from localStorage:", error);
-      }
-    }
-  }, []);
-
+export default function DashboardPage() {
   return (
-    <div className="h-[100vh] w-[100vw]">
-      <div className="relative z-0">
-        <MapContainer
-          style={{
-            height: "100vh",
-            width: "100%",
-          }}
-          ref={mapRef}
-          center={center}
-          zoom={13}
-          zoomControl={true}
-          scrollWheelZoom={true}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            detectRetina={true}
-            maxZoom={19}
-            minZoom={1}
-          />
-          <MainContainer />
-        </MapContainer>
-      </div>{" "}
+    <div className="min-h-screen relative overflow-hidden bg-black">
+        <img
+          src="/background.webp"
+          alt="Background"
+          className="w-full h-full object-cover blur-sm fixed"
+        />
+
+      <div className="relative z-10">
+        <header className="container mx-auto px-4 py-8">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-lime-500/90 rounded-xl shadow-lg">
+              <Flower2 className="w-8 h-8 text-green-900" />
+            </div>
+            <h1 className="text-3xl font-bold text-white drop-shadow-lg">Bloom Tracker</h1>
+          </div>
+        </header>
+
+        <main className="container mx-auto px-4 py-8 space-y-12">
+          <IntroSection />
+          <MapPreview />
+        </main>
+      </div>
     </div>
-  );
+  )
 }
