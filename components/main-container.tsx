@@ -578,7 +578,7 @@ const MainContainer = () => {
                         </CardContent>
                       </Card>
 
-                      <Card>
+                      {/* <Card>
                         <CardHeader className="pb-3">
                           <CardTitle className="text-sm">
                             Annual Trend
@@ -612,7 +612,7 @@ const MainContainer = () => {
                             </ResponsiveContainer>
                           </div>
                         </CardContent>
-                      </Card>
+                      </Card> */}
                     </TabsContent>
                   </Tabs>
 
