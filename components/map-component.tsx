@@ -11,7 +11,7 @@ export default function MapComponent() {
 
   useEffect(() => {
     setIsClient(true);
-    
+
     try {
       const lastLat = localStorage.getItem("lastLat");
       const lastLng = localStorage.getItem("lastLng");

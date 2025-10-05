@@ -1,6 +1,13 @@
 import { Card } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Sparkles, Map, BarChart3, Search, Globe, CircleQuestionMark } from "lucide-react";
+import {
+  Sparkles,
+  Map,
+  BarChart3,
+  Search,
+  Globe,
+  CircleQuestionMark,
+} from "lucide-react";
 import SearchContainer from "./search-container";
 import Link from "next/link";
 
@@ -47,7 +54,7 @@ export function IntroSection() {
                   "bg-lime-500 hover:bg-lime-600 text-green-900 font-semibold shadow-lg",
               })}
             >
-              <CircleQuestionMark/>
+              <CircleQuestionMark />
               About
             </Link>
           </div>

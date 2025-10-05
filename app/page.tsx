@@ -1,7 +1,7 @@
-"use client"
-import dynamic from 'next/dynamic';
+"use client";
+import dynamic from "next/dynamic";
 
-const DashboardPage = dynamic(() => import('@/components/dashboard-client'), {
+const DashboardPage = dynamic(() => import("@/components/dashboard-client"), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen bg-black flex items-center justify-center">

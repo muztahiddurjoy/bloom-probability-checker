@@ -172,7 +172,7 @@ const FlowerPage = () => {
       try {
         setLoading(true);
         const response = await fetch(`/api/trefle/plants/${flowerId}`);
-        
+
         if (!response.ok) throw new Error("Failed to fetch flower data");
         const data: TreflePlantResponse = await response.json();
         setFlowerData(data.data);
@@ -230,7 +230,10 @@ const FlowerPage = () => {
   };
 
   const getCommonNames = () => {
-    if (mainSpecies.common_names && Object.keys(mainSpecies.common_names).length > 0) {
+    if (
+      mainSpecies.common_names &&
+      Object.keys(mainSpecies.common_names).length > 0
+    ) {
       return Object.values(mainSpecies.common_names).flat();
     }
     return [];
@@ -258,7 +261,9 @@ const FlowerPage = () => {
   );
 
   const getGrowthInfo = (value: any) => {
-    return value !== null && value !== undefined ? String(value) : "Not specified";
+    return value !== null && value !== undefined
+      ? String(value)
+      : "Not specified";
   };
 
   return (
@@ -276,7 +281,6 @@ const FlowerPage = () => {
                 Back to Search
               </Button>
             </Link>
-            
           </div>
         </div>
       </header>
@@ -310,12 +314,14 @@ const FlowerPage = () => {
                     <div className="text-sm">
                       {flowerData.author && (
                         <p className="text-lime-800">
-                          <span className="font-semibold">Author:</span> {flowerData.author}
+                          <span className="font-semibold">Author:</span>{" "}
+                          {flowerData.author}
                         </p>
                       )}
                       {flowerData.bibliography && (
                         <p className="text-gray-600 mt-1">
-                          <span className="font-semibold">Source:</span> {flowerData.bibliography}
+                          <span className="font-semibold">Source:</span>{" "}
+                          {flowerData.bibliography}
                         </p>
                       )}
                       {flowerData.year && (
@@ -338,7 +344,8 @@ const FlowerPage = () => {
                 {flowerData.family && (
                   <Badge className="bg-lime-500 text-white hover:bg-lime-600 transition-colors">
                     {flowerData.family.name}
-                    {flowerData.family.common_name && ` (${flowerData.family.common_name})`}
+                    {flowerData.family.common_name &&
+                      ` (${flowerData.family.common_name})`}
                   </Badge>
                 )}
                 {mainSpecies.specifications?.growth_habit && (
@@ -374,15 +381,17 @@ const FlowerPage = () => {
                 <div className="mb-4">
                   <p className="text-sm text-gray-600 mb-2">Common names:</p>
                   <div className="flex flex-wrap gap-2">
-                    {getCommonNames().slice(0, 5).map((name, index) => (
-                      <Badge
-                        key={index}
-                        variant="secondary"
-                        className="bg-lime-100 text-lime-800"
-                      >
-                        {name}
-                      </Badge>
-                    ))}
+                    {getCommonNames()
+                      .slice(0, 5)
+                      .map((name, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="bg-lime-100 text-lime-800"
+                        >
+                          {name}
+                        </Badge>
+                      ))}
                     {getCommonNames().length > 5 && (
                       <Badge variant="outline" className="text-xs">
                         +{getCommonNames().length - 5} more
@@ -420,7 +429,7 @@ const FlowerPage = () => {
                     <Ruler className="w-6 h-6 text-blue-500 mx-auto mb-2" />
                     <p className="text-xs text-gray-600">Avg Height</p>
                     <p className="font-semibold text-lime-900 text-sm">
-                      {mainSpecies.specifications?.average_height?.cm 
+                      {mainSpecies.specifications?.average_height?.cm
                         ? `${mainSpecies.specifications.average_height.cm} cm`
                         : "N/A"}
                     </p>
@@ -488,7 +497,9 @@ const FlowerPage = () => {
                         <div className="space-y-3">
                           <div className="flex justify-between items-center p-3 bg-white/50 rounded-lg border border-lime-200">
                             <span className="text-gray-600">Kingdom:</span>
-                            <span className="font-medium text-lime-900">Plantae</span>
+                            <span className="font-medium text-lime-900">
+                              Plantae
+                            </span>
                           </div>
                           <div className="flex justify-between items-center p-3 bg-white/50 rounded-lg border border-lime-200">
                             <span className="text-gray-600">Family:</span>
@@ -524,11 +535,13 @@ const FlowerPage = () => {
                           </div>
                           <div className="flex justify-between items-center p-3 bg-white/50 rounded-lg border border-lime-200">
                             <span className="text-gray-600">Status:</span>
-                            <Badge className={
-                              mainSpecies.status === 'accepted' 
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-amber-100 text-amber-800'
-                            }>
+                            <Badge
+                              className={
+                                mainSpecies.status === "accepted"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-amber-100 text-amber-800"
+                              }
+                            >
                               {mainSpecies.status}
                             </Badge>
                           </div>
@@ -547,32 +560,35 @@ const FlowerPage = () => {
                     </div>
 
                     {/* Synonyms */}
-                    {mainSpecies.synonyms && mainSpecies.synonyms.length > 0 && (
-                      <div className="mt-6">
-                        <h4 className="font-semibold text-lime-900 mb-3">
-                          Synonyms
-                        </h4>
-                        <div className="bg-white/50 p-4 rounded-lg border border-lime-200">
-                          <div className="flex flex-wrap gap-2">
-                            {mainSpecies.synonyms.slice(0, 5).map((synonym, index) => (
-                              <Badge
-                                key={index}
-                                variant="outline"
-                                className="bg-blue-50 text-blue-700 border-blue-200"
-                              >
-                                {synonym.name}
-                                {synonym.author && ` (${synonym.author})`}
-                              </Badge>
-                            ))}
-                            {mainSpecies.synonyms.length > 5 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{mainSpecies.synonyms.length - 5} more
-                              </Badge>
-                            )}
+                    {mainSpecies.synonyms &&
+                      mainSpecies.synonyms.length > 0 && (
+                        <div className="mt-6">
+                          <h4 className="font-semibold text-lime-900 mb-3">
+                            Synonyms
+                          </h4>
+                          <div className="bg-white/50 p-4 rounded-lg border border-lime-200">
+                            <div className="flex flex-wrap gap-2">
+                              {mainSpecies.synonyms
+                                .slice(0, 5)
+                                .map((synonym, index) => (
+                                  <Badge
+                                    key={index}
+                                    variant="outline"
+                                    className="bg-blue-50 text-blue-700 border-blue-200"
+                                  >
+                                    {synonym.name}
+                                    {synonym.author && ` (${synonym.author})`}
+                                  </Badge>
+                                ))}
+                              {mainSpecies.synonyms.length > 5 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{mainSpecies.synonyms.length - 5} more
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -581,7 +597,8 @@ const FlowerPage = () => {
               <TabsContent value="distribution" className="space-y-4 mt-4">
                 <Card className="border-lime-200/50 bg-white/30 backdrop-blur-sm">
                   <CardContent className="p-6">
-                    {mainSpecies.distribution?.native && mainSpecies.distribution.native.length > 0 ? (
+                    {mainSpecies.distribution?.native &&
+                    mainSpecies.distribution.native.length > 0 ? (
                       <div>
                         <h4 className="font-semibold text-lime-900 mb-4 flex items-center gap-2">
                           <MapPin className="w-5 h-5" />
@@ -594,30 +611,47 @@ const FlowerPage = () => {
                             </p>
                             <div className="bg-white/50 p-4 rounded-lg border border-lime-200 max-h-60 overflow-y-auto">
                               <div className="space-y-2">
-                                {mainSpecies.distribution.native.map((region, index) => (
-                                  <div key={index} className="flex items-center gap-2 p-2 hover:bg-lime-50 rounded">
-                                    <MapPin className="w-4 h-4 text-lime-600 flex-shrink-0" />
-                                    <span className="text-lime-900">{region}</span>
-                                  </div>
-                                ))}
+                                {mainSpecies.distribution.native.map(
+                                  (region, index) => (
+                                    <div
+                                      key={index}
+                                      className="flex items-center gap-2 p-2 hover:bg-lime-50 rounded"
+                                    >
+                                      <MapPin className="w-4 h-4 text-lime-600 flex-shrink-0" />
+                                      <span className="text-lime-900">
+                                        {region}
+                                      </span>
+                                    </div>
+                                  ),
+                                )}
                               </div>
                             </div>
                           </div>
-                          
+
                           {mainSpecies.distributions?.native && (
                             <div>
                               <p className="text-sm text-gray-600 mb-3">
                                 Distribution details:
                               </p>
                               <div className="space-y-2">
-                                {mainSpecies.distributions.native.slice(0, 5).map((dist, index) => (
-                                  <div key={index} className="flex justify-between items-center p-3 bg-white/50 rounded-lg border border-lime-200">
-                                    <span className="font-medium text-lime-900">{dist.name}</span>
-                                    <Badge variant="outline" className="text-xs">
-                                      {dist.species_count} species
-                                    </Badge>
-                                  </div>
-                                ))}
+                                {mainSpecies.distributions.native
+                                  .slice(0, 5)
+                                  .map((dist, index) => (
+                                    <div
+                                      key={index}
+                                      className="flex justify-between items-center p-3 bg-white/50 rounded-lg border border-lime-200"
+                                    >
+                                      <span className="font-medium text-lime-900">
+                                        {dist.name}
+                                      </span>
+                                      <Badge
+                                        variant="outline"
+                                        className="text-xs"
+                                      >
+                                        {dist.species_count} species
+                                      </Badge>
+                                    </div>
+                                  ))}
                               </div>
                             </div>
                           )}
@@ -714,14 +748,19 @@ const FlowerPage = () => {
                         </h4>
                         <div className="space-y-3">
                           <BooleanIndicator
-                            value={mainSpecies.specifications?.nitrogen_fixation !== null}
+                            value={
+                              mainSpecies.specifications?.nitrogen_fixation !==
+                              null
+                            }
                             trueText="Nitrogen Fixing"
                             falseText="Not Nitrogen Fixing"
                           />
                           <div className="flex justify-between">
                             <span className="text-gray-600">Toxicity:</span>
                             <span className="font-medium text-lime-900">
-                              {getGrowthInfo(mainSpecies.specifications?.toxicity)}
+                              {getGrowthInfo(
+                                mainSpecies.specifications?.toxicity,
+                              )}
                             </span>
                           </div>
                         </div>
@@ -740,12 +779,14 @@ const FlowerPage = () => {
                         <h4 className="font-semibold text-lime-900">
                           Growth Requirements
                         </h4>
-                        
+
                         {mainSpecies.growth?.light !== null && (
                           <div className="flex items-center gap-3 p-3 bg-white/50 rounded-lg border border-lime-200">
                             <Sun className="w-5 h-5 text-amber-500" />
                             <div>
-                              <p className="text-sm text-gray-600">Light Requirement</p>
+                              <p className="text-sm text-gray-600">
+                                Light Requirement
+                              </p>
                               <p className="font-medium text-lime-900">
                                 {mainSpecies.growth.light} (index)
                               </p>
@@ -753,17 +794,21 @@ const FlowerPage = () => {
                           </div>
                         )}
 
-                        {mainSpecies.growth?.ph_minimum !== null && mainSpecies.growth?.ph_maximum !== null && (
-                          <div className="flex items-center gap-3 p-3 bg-white/50 rounded-lg border border-lime-200">
-                            <Droplets className="w-5 h-5 text-blue-500" />
-                            <div>
-                              <p className="text-sm text-gray-600">Soil pH Range</p>
-                              <p className="font-medium text-lime-900">
-                                {mainSpecies.growth.ph_minimum} - {mainSpecies.growth.ph_maximum}
-                              </p>
+                        {mainSpecies.growth?.ph_minimum !== null &&
+                          mainSpecies.growth?.ph_maximum !== null && (
+                            <div className="flex items-center gap-3 p-3 bg-white/50 rounded-lg border border-lime-200">
+                              <Droplets className="w-5 h-5 text-blue-500" />
+                              <div>
+                                <p className="text-sm text-gray-600">
+                                  Soil pH Range
+                                </p>
+                                <p className="font-medium text-lime-900">
+                                  {mainSpecies.growth.ph_minimum} -{" "}
+                                  {mainSpecies.growth.ph_maximum}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
                         {mainSpecies.growth?.spread?.cm !== null && (
                           <div className="flex items-center gap-3 p-3 bg-white/50 rounded-lg border border-lime-200">
@@ -782,75 +827,109 @@ const FlowerPage = () => {
                         <h4 className="font-semibold text-lime-900">
                           Seasonal Information
                         </h4>
-                        
-                        {mainSpecies.growth?.growth_months && mainSpecies.growth.growth_months.length > 0 && (
-                          <div className="p-3 bg-white/50 rounded-lg border border-lime-200">
-                            <p className="text-sm text-gray-600 mb-2">Active Growth Months</p>
-                            <div className="flex flex-wrap gap-1">
-                              {mainSpecies.growth.growth_months.map((month, index) => (
-                                <Badge key={index} className="bg-green-100 text-green-800 text-xs">
-                                  {month}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
 
-                        {mainSpecies.growth?.bloom_months && mainSpecies.growth.bloom_months.length > 0 && (
-                          <div className="p-3 bg-white/50 rounded-lg border border-lime-200">
-                            <p className="text-sm text-gray-600 mb-2">Bloom Months</p>
-                            <div className="flex flex-wrap gap-1">
-                              {mainSpecies.growth.bloom_months.map((month, index) => (
-                                <Badge key={index} className="bg-purple-100 text-purple-800 text-xs">
-                                  {month}
-                                </Badge>
-                              ))}
+                        {mainSpecies.growth?.growth_months &&
+                          mainSpecies.growth.growth_months.length > 0 && (
+                            <div className="p-3 bg-white/50 rounded-lg border border-lime-200">
+                              <p className="text-sm text-gray-600 mb-2">
+                                Active Growth Months
+                              </p>
+                              <div className="flex flex-wrap gap-1">
+                                {mainSpecies.growth.growth_months.map(
+                                  (month, index) => (
+                                    <Badge
+                                      key={index}
+                                      className="bg-green-100 text-green-800 text-xs"
+                                    >
+                                      {month}
+                                    </Badge>
+                                  ),
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                        {mainSpecies.growth?.fruit_months && mainSpecies.growth.fruit_months.length > 0 && (
-                          <div className="p-3 bg-white/50 rounded-lg border border-lime-200">
-                            <p className="text-sm text-gray-600 mb-2">Fruit Months</p>
-                            <div className="flex flex-wrap gap-1">
-                              {mainSpecies.growth.fruit_months.map((month, index) => (
-                                <Badge key={index} className="bg-orange-100 text-orange-800 text-xs">
-                                  {month}
-                                </Badge>
-                              ))}
+                        {mainSpecies.growth?.bloom_months &&
+                          mainSpecies.growth.bloom_months.length > 0 && (
+                            <div className="p-3 bg-white/50 rounded-lg border border-lime-200">
+                              <p className="text-sm text-gray-600 mb-2">
+                                Bloom Months
+                              </p>
+                              <div className="flex flex-wrap gap-1">
+                                {mainSpecies.growth.bloom_months.map(
+                                  (month, index) => (
+                                    <Badge
+                                      key={index}
+                                      className="bg-purple-100 text-purple-800 text-xs"
+                                    >
+                                      {month}
+                                    </Badge>
+                                  ),
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
+
+                        {mainSpecies.growth?.fruit_months &&
+                          mainSpecies.growth.fruit_months.length > 0 && (
+                            <div className="p-3 bg-white/50 rounded-lg border border-lime-200">
+                              <p className="text-sm text-gray-600 mb-2">
+                                Fruit Months
+                              </p>
+                              <div className="flex flex-wrap gap-1">
+                                {mainSpecies.growth.fruit_months.map(
+                                  (month, index) => (
+                                    <Badge
+                                      key={index}
+                                      className="bg-orange-100 text-orange-800 text-xs"
+                                    >
+                                      {month}
+                                    </Badge>
+                                  ),
+                                )}
+                              </div>
+                            </div>
+                          )}
                       </div>
                     </div>
 
                     {/* Temperature and Precipitation */}
-                    {(mainSpecies.growth?.minimum_temperature?.deg_c !== null || 
+                    {(mainSpecies.growth?.minimum_temperature?.deg_c !== null ||
                       mainSpecies.growth?.maximum_temperature?.deg_c !== null ||
-                      mainSpecies.growth?.minimum_precipitation?.mm !== null) && (
+                      mainSpecies.growth?.minimum_precipitation?.mm !==
+                        null) && (
                       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {mainSpecies.growth.minimum_temperature?.deg_c !== null && (
+                        {mainSpecies.growth.minimum_temperature?.deg_c !==
+                          null && (
                           <div className="text-center p-3 bg-white/50 rounded-lg border border-lime-200">
                             <Thermometer className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-                            <p className="text-xs text-gray-600">Min Temperature</p>
+                            <p className="text-xs text-gray-600">
+                              Min Temperature
+                            </p>
                             <p className="font-semibold text-lime-900">
                               {mainSpecies.growth.minimum_temperature.deg_c}°C
                             </p>
                           </div>
                         )}
-                        {mainSpecies.growth.maximum_temperature?.deg_c !== null && (
+                        {mainSpecies.growth.maximum_temperature?.deg_c !==
+                          null && (
                           <div className="text-center p-3 bg-white/50 rounded-lg border border-lime-200">
                             <Thermometer className="w-6 h-6 text-red-500 mx-auto mb-2" />
-                            <p className="text-xs text-gray-600">Max Temperature</p>
+                            <p className="text-xs text-gray-600">
+                              Max Temperature
+                            </p>
                             <p className="font-semibold text-lime-900">
                               {mainSpecies.growth.maximum_temperature.deg_c}°C
                             </p>
                           </div>
                         )}
-                        {mainSpecies.growth.minimum_precipitation?.mm !== null && (
+                        {mainSpecies.growth.minimum_precipitation?.mm !==
+                          null && (
                           <div className="text-center p-3 bg-white/50 rounded-lg border border-lime-200">
                             <Droplets className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-                            <p className="text-xs text-gray-600">Min Precipitation</p>
+                            <p className="text-xs text-gray-600">
+                              Min Precipitation
+                            </p>
                             <p className="font-semibold text-lime-900">
                               {mainSpecies.growth.minimum_precipitation.mm}mm
                             </p>

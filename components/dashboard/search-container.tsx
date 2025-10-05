@@ -53,16 +53,17 @@ interface TrefleSearchResponse {
 
 const SearchContainer = () => {
   const [query, setQuery] = useState<string>("");
-  const [searchResponse, setSearchResponse] = useState<TrefleSearchResponse | null>(null);
+  const [searchResponse, setSearchResponse] =
+    useState<TrefleSearchResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const getFlowerData = async () => {
     if (!query.trim()) return;
-    
+
     try {
       setLoading(true);
       const res = await axios.get(
-        `/api/trefle?q=${encodeURIComponent(query)}&limit=10`
+        `/api/trefle?q=${encodeURIComponent(query)}&limit=10`,
       );
       setSearchResponse(res.data);
     } catch (err) {
@@ -131,10 +132,7 @@ const SearchContainer = () => {
             <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-3">
                 {searchResponse.data.map((species) => (
-                  <SearchResultAdapter 
-                    key={species.id} 
-                    species={species}
-                  />
+                  <SearchResultAdapter key={species.id} species={species} />
                 ))}
                 {searchResponse.data.length === 0 && (
                   <div className="text-center py-8 text-gray-500">

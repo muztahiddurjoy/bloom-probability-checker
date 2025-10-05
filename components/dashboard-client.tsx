@@ -13,9 +13,9 @@ export default function DashboardClient() {
     };
 
     handleScroll(); // Set initial value
-    
+
     window.addEventListener("scroll", handleScroll, { passive: true });
-    
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };

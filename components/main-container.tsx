@@ -71,7 +71,9 @@ interface ApiResponse {
 
 // Custom bloom markers
 const bloomDetectedIcon = new L.Icon({
-  iconUrl: 'data:image/svg+xml;base64,' + btoa(`
+  iconUrl:
+    "data:image/svg+xml;base64," +
+    btoa(`
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="16" cy="16" r="14" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
       <circle cx="16" cy="16" r="6" fill="#fef3c7"/>
@@ -83,7 +85,9 @@ const bloomDetectedIcon = new L.Icon({
 });
 
 const noBloomIcon = new L.Icon({
-  iconUrl: 'data:image/svg+xml;base64,' + btoa(`
+  iconUrl:
+    "data:image/svg+xml;base64," +
+    btoa(`
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="16" cy="16" r="14" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
       <circle cx="16" cy="16" r="6" fill="#d1fae5"/>
@@ -106,7 +110,9 @@ const MainContainer = () => {
   const [sheetOpen, setSheetOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [apiData, setApiData] = useState<ApiResponse | null>(null);
-  const [markers, setMarkers] = useState<Array<LatLng & { data?: ApiResponse }>>([]);
+  const [markers, setMarkers] = useState<
+    Array<LatLng & { data?: ApiResponse }>
+  >([]);
 
   const map = useMap();
 
@@ -120,17 +126,20 @@ const MainContainer = () => {
       setSheetOpen(true);
 
       try {
-        const response = await fetch("https://naseefnazrul-bloomai.hf.space/predict", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          "https://naseefnazrul-bloomai.hf.space/predict",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              lat: lat,
+              lon: lng,
+              date: new Date().toISOString().split("T")[0], // Current date in YYYY-MM-DD format
+            }),
           },
-          body: JSON.stringify({
-            lat: lat,
-            lon: lng,
-            date: new Date().toISOString().split('T')[0] // Current date in YYYY-MM-DD format
-          }),
-        });
+        );
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -141,7 +150,6 @@ const MainContainer = () => {
 
         // Add marker to the clicked location with API data
         setMarkers([{ ...clickedLocation, data }]);
-
       } catch (error) {
         console.error("Error fetching bloom data:", error);
         // Fallback to mock data if API fails
@@ -150,17 +158,32 @@ const MainContainer = () => {
           status: Math.random() > 0.5 ? "BLOOM_DETECTED" : "NO_BLOOM",
           peak_month: Math.random() > 0.5 ? 10 : null,
           peak_probability: Math.random() > 0.5 ? 85 : null,
-          bloom_window: Math.random() > 0.5 ? [1,2,3,4,5,6,7,8,9,10,11,12] : null,
-          top_species: Math.random() > 0.5 ? [
-            { name: "Acer pensylvanicum L.", probability: 16.17 },
-            { name: "Acer rubrum L.", probability: 12.15 },
-            { name: "Vaccinium vitis-idaea L.", probability: 11.8 }
-          ] : null,
+          bloom_window:
+            Math.random() > 0.5
+              ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+              : null,
+          top_species:
+            Math.random() > 0.5
+              ? [
+                  { name: "Acer pensylvanicum L.", probability: 16.17 },
+                  { name: "Acer rubrum L.", probability: 12.15 },
+                  { name: "Vaccinium vitis-idaea L.", probability: 11.8 },
+                ]
+              : null,
           monthly_probabilities: {
-            "1": 8.65, "2": 8.698, "3": 11.481, "4": 15.986, "5": 16.828,
-            "6": 11.355, "7": 5.38, "8": 2.696, "9": 1.775, "10": 2.598,
-            "11": 5.871, "12": 8.682
-          }
+            "1": 8.65,
+            "2": 8.698,
+            "3": 11.481,
+            "4": 15.986,
+            "5": 16.828,
+            "6": 11.355,
+            "7": 5.38,
+            "8": 2.696,
+            "9": 1.775,
+            "10": 2.598,
+            "11": 5.871,
+            "12": 8.682,
+          },
         };
         setApiData(mockData);
         setMarkers([{ ...clickedLocation, data: mockData }]);
@@ -229,8 +252,23 @@ const MainContainer = () => {
     return data.monthly_probabilities[currentMonth] || 0;
   };
 
-  const formatMonthlyData = (monthlyProbabilities: { [key: string]: number }) => {
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const formatMonthlyData = (monthlyProbabilities: {
+    [key: string]: number;
+  }) => {
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     return Object.entries(monthlyProbabilities).map(([month, probability]) => ({
       month: monthNames[parseInt(month) - 1],
       probability: probability,
@@ -239,7 +277,9 @@ const MainContainer = () => {
 
   const bloomStatus = apiData ? getBloomStatus(apiData) : null;
   const currentProbability = apiData ? getCurrentProbability(apiData) : 0;
-  const monthlyData = apiData ? formatMonthlyData(apiData.monthly_probabilities) : [];
+  const monthlyData = apiData
+    ? formatMonthlyData(apiData.monthly_probabilities)
+    : [];
 
   return (
     <div>
@@ -263,7 +303,11 @@ const MainContainer = () => {
         <Marker
           key={index}
           position={[marker.lat, marker.lng]}
-          icon={marker.data?.status === "BLOOM_DETECTED" ? bloomDetectedIcon : noBloomIcon}
+          icon={
+            marker.data?.status === "BLOOM_DETECTED"
+              ? bloomDetectedIcon
+              : noBloomIcon
+          }
         >
           <Popup>
             <div className="text-sm min-w-[200px]">
@@ -271,8 +315,16 @@ const MainContainer = () => {
                 <div
                   className={`w-3 h-3 rounded-full ${marker.data?.status === "BLOOM_DETECTED" ? "bg-red-500" : "bg-green-500"}`}
                 />
-                <strong className={marker.data?.status === "BLOOM_DETECTED" ? "text-red-600" : "text-green-600"}>
-                  {marker.data?.status === "BLOOM_DETECTED" ? "Bloom Detected" : "No Bloom"}
+                <strong
+                  className={
+                    marker.data?.status === "BLOOM_DETECTED"
+                      ? "text-red-600"
+                      : "text-green-600"
+                  }
+                >
+                  {marker.data?.status === "BLOOM_DETECTED"
+                    ? "Bloom Detected"
+                    : "No Bloom"}
                 </strong>
               </div>
               <div className="space-y-1">
@@ -286,7 +338,9 @@ const MainContainer = () => {
                 </div>
                 <div className="flex justify-between">
                   <span>Current Risk:</span>
-                  <span className={`font-semibold ${marker.data?.status === "BLOOM_DETECTED" ? "text-red-600" : "text-green-600"}`}>
+                  <span
+                    className={`font-semibold ${marker.data?.status === "BLOOM_DETECTED" ? "text-red-600" : "text-green-600"}`}
+                  >
                     {currentProbability}%
                   </span>
                 </div>
@@ -306,7 +360,9 @@ const MainContainer = () => {
                 <div
                   className={`p-2 rounded-lg ${bloomStatus.bgColor} ${bloomStatus.borderColor}`}
                 >
-                  <bloomStatus.icon className={`w-5 h-5 ${bloomStatus.color}`} />
+                  <bloomStatus.icon
+                    className={`w-5 h-5 ${bloomStatus.color}`}
+                  />
                 </div>
               ) : null}
               <div>
@@ -325,10 +381,9 @@ const MainContainer = () => {
                   )}
                 </SheetTitle>
                 <SheetDescription>
-                  {loading 
-                    ? "Fetching real-time bloom prediction data..." 
-                    : "Satellite data analysis for selected location"
-                  }
+                  {loading
+                    ? "Fetching real-time bloom prediction data..."
+                    : "Satellite data analysis for selected location"}
                 </SheetDescription>
               </div>
             </div>
@@ -339,7 +394,9 @@ const MainContainer = () => {
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-12 space-y-4">
                   <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-                  <p className="text-sm text-gray-600">Analyzing bloom probability...</p>
+                  <p className="text-sm text-gray-600">
+                    Analyzing bloom probability...
+                  </p>
                 </div>
               ) : apiData ? (
                 <>
@@ -356,7 +413,9 @@ const MainContainer = () => {
                               Peak Month
                             </p>
                             <p className="text-lg font-bold text-blue-900">
-                              {apiData.peak_month ? `Month ${apiData.peak_month}` : "N/A"}
+                              {apiData.peak_month
+                                ? `Month ${apiData.peak_month}`
+                                : "N/A"}
                             </p>
                           </div>
                         </div>
@@ -374,7 +433,9 @@ const MainContainer = () => {
                               Peak Probability
                             </p>
                             <p className="text-lg font-bold text-green-900">
-                              {apiData.peak_probability ? `${apiData.peak_probability}%` : "N/A"}
+                              {apiData.peak_probability
+                                ? `${apiData.peak_probability}%`
+                                : "N/A"}
                             </p>
                           </div>
                         </div>
@@ -428,7 +489,9 @@ const MainContainer = () => {
                                 <CheckCircle className="w-5 h-5 mt-0.5 text-green-600" />
                               )}
                               <div>
-                                <p className={`font-semibold ${currentProbability >= 70 ? "text-red-600" : currentProbability >= 40 ? "text-yellow-600" : "text-green-600"}`}>
+                                <p
+                                  className={`font-semibold ${currentProbability >= 70 ? "text-red-600" : currentProbability >= 40 ? "text-yellow-600" : "text-green-600"}`}
+                                >
                                   {currentProbability >= 70
                                     ? "High bloom risk this month"
                                     : currentProbability >= 40
@@ -447,29 +510,35 @@ const MainContainer = () => {
                       </Card>
 
                       {/* Top Species */}
-                      {apiData.top_species && apiData.top_species.length > 0 && (
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-sm">
-                              Top Plant Species
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="space-y-3">
-                              {apiData.top_species.slice(0, 3).map((species, index) => (
-                                <div key={index} className="flex justify-between items-center">
-                                  <span className="text-sm flex-1 truncate mr-2">
-                                    {species.name}
-                                  </span>
-                                  <span className="text-sm font-semibold text-blue-600">
-                                    {species.probability}%
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      )}
+                      {apiData.top_species &&
+                        apiData.top_species.length > 0 && (
+                          <Card>
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-sm">
+                                Top Plant Species
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-3">
+                                {apiData.top_species
+                                  .slice(0, 3)
+                                  .map((species, index) => (
+                                    <div
+                                      key={index}
+                                      className="flex justify-between items-center"
+                                    >
+                                      <span className="text-sm flex-1 truncate mr-2">
+                                        {species.name}
+                                      </span>
+                                      <span className="text-sm font-semibold text-blue-600">
+                                        {species.probability}%
+                                      </span>
+                                    </div>
+                                  ))}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
                     </TabsContent>
 
                     {/* Trends Tab */}
@@ -485,15 +554,21 @@ const MainContainer = () => {
                           <div className="h-[300px]">
                             <ResponsiveContainer width="100%" height="100%">
                               <BarChart data={monthlyData}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <CartesianGrid
+                                  strokeDasharray="3 3"
+                                  stroke="#f0f0f0"
+                                />
                                 <XAxis dataKey="month" />
                                 <YAxis />
-                                <Tooltip 
-                                  formatter={(value) => [`${value}%`, "Probability"]}
+                                <Tooltip
+                                  formatter={(value) => [
+                                    `${value}%`,
+                                    "Probability",
+                                  ]}
                                 />
-                                <Bar 
-                                  dataKey="probability" 
-                                  fill="#3b82f6" 
+                                <Bar
+                                  dataKey="probability"
+                                  fill="#3b82f6"
                                   name="Probability"
                                   radius={[2, 2, 0, 0]}
                                 />
@@ -513,11 +588,17 @@ const MainContainer = () => {
                           <div className="h-[200px]">
                             <ResponsiveContainer width="100%" height="100%">
                               <LineChart data={monthlyData}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <CartesianGrid
+                                  strokeDasharray="3 3"
+                                  stroke="#f0f0f0"
+                                />
                                 <XAxis dataKey="month" />
                                 <YAxis />
-                                <Tooltip 
-                                  formatter={(value) => [`${value}%`, "Probability"]}
+                                <Tooltip
+                                  formatter={(value) => [
+                                    `${value}%`,
+                                    "Probability",
+                                  ]}
                                 />
                                 <Line
                                   type="monotone"
@@ -525,7 +606,7 @@ const MainContainer = () => {
                                   stroke="#ef4444"
                                   strokeWidth={2}
                                   name="Bloom Probability"
-                                  dot={{ fill: '#ef4444', strokeWidth: 2 }}
+                                  dot={{ fill: "#ef4444", strokeWidth: 2 }}
                                 />
                               </LineChart>
                             </ResponsiveContainer>
@@ -545,15 +626,21 @@ const MainContainer = () => {
                     <CardContent>
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <p className="text-gray-600 font-medium">Coordinates</p>
+                          <p className="text-gray-600 font-medium">
+                            Coordinates
+                          </p>
                           <p className="font-mono text-xs mt-1">
                             {selectedLocation?.lat.toFixed(6)},{" "}
                             {selectedLocation?.lng.toFixed(6)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-gray-600 font-medium">Analysis Date</p>
-                          <p className="text-gray-900">{new Date().toLocaleDateString()}</p>
+                          <p className="text-gray-600 font-medium">
+                            Analysis Date
+                          </p>
+                          <p className="text-gray-900">
+                            {new Date().toLocaleDateString()}
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -562,7 +649,9 @@ const MainContainer = () => {
               ) : (
                 <div className="text-center py-8 text-gray-500">
                   <XCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                  <p>No data available. Click on the map to analyze a location.</p>
+                  <p>
+                    No data available. Click on the map to analyze a location.
+                  </p>
                 </div>
               )}
             </div>

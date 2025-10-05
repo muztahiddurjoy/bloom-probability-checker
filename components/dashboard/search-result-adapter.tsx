@@ -87,7 +87,8 @@ const SearchResultAdapter = ({ species }: SearchResultAdapterProps) => {
                   className="text-xs bg-lime-100 text-lime-800"
                 >
                   {species.family}
-                  {species.family_common_name && ` (${species.family_common_name})`}
+                  {species.family_common_name &&
+                    ` (${species.family_common_name})`}
                 </Badge>
               )}
               {species.genus && (
@@ -118,9 +119,7 @@ const SearchResultAdapter = ({ species }: SearchResultAdapterProps) => {
             {/* Synonyms */}
             {species.synonyms && species.synonyms.length > 0 && (
               <div className="mt-2">
-                <p className="text-xs text-gray-500 mb-1">
-                  Also known as:
-                </p>
+                <p className="text-xs text-gray-500 mb-1">Also known as:</p>
                 <div className="flex flex-wrap gap-1">
                   {species.synonyms.slice(0, 2).map((synonym, index) => (
                     <Badge
