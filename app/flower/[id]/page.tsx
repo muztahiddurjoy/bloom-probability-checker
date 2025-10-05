@@ -276,29 +276,7 @@ const FlowerPage = () => {
                 Back to Search
               </Button>
             </Link>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                className={`border-lime-300 transition-all duration-300 ${
-                  isFavorite
-                    ? "bg-red-50 border-red-200 text-red-600 hover:bg-red-100"
-                    : "text-lime-700 hover:bg-lime-100/50"
-                }`}
-                onClick={() => setIsFavorite(!isFavorite)}
-              >
-                <Heart
-                  className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`}
-                />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="border-lime-300 text-lime-700 hover:bg-lime-100/50 transition-colors"
-              >
-                <Share2 className="w-4 h-4" />
-              </Button>
-            </div>
+            
           </div>
         </div>
       </header>
