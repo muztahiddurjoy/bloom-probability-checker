@@ -1,0 +1,331 @@
+[
+  {
+    "id": 0,
+    "site_short": "ABBY",
+    "site_name": "Abby Road",
+    "latitude": 45.761789,
+    "longitude": -122.327572
+  },
+  {
+    "id": 1,
+    "site_short": "BARR",
+    "site_name": "Utqiaġvik",
+    "latitude": 71.282807,
+    "longitude": -156.601636
+  },
+  {
+    "id": 2,
+    "site_short": "BART",
+    "site_name": "Bartlett Experimental Forest",
+    "latitude": 44.066951,
+    "longitude": -71.288437
+  },
+  {
+    "id": 3,
+    "site_short": "BLAN",
+    "site_name": "Blandy Experimental Farm",
+    "latitude": 39.059627,
+    "longitude": -78.073846
+  },
+  {
+    "id": 4,
+    "site_short": "BONA",
+    "site_name": "Caribou-Poker Creeks Research Watershed",
+    "latitude": 65.154561,
+    "longitude": -147.511335
+  },
+  {
+    "id": 5,
+    "site_short": "CLBJ",
+    "site_name": "Lyndon B. Johnson National Grassland",
+    "latitude": 33.398137,
+    "longitude": -97.569967
+  },
+  {
+    "id": 6,
+    "site_short": "CPER",
+    "site_name": "Central Plains Experimental Range",
+    "latitude": 40.817814,
+    "longitude": -104.745302
+  },
+  {
+    "id": 7,
+    "site_short": "DCFS",
+    "site_name": "Dakota Coteau Field",
+    "latitude": 47.162389,
+    "longitude": -99.109835
+  },
+  {
+    "id": 8,
+    "site_short": "DEJU",
+    "site_name": "Delta Junction",
+    "latitude": 63.880381,
+    "longitude": -145.744174
+  },
+  {
+    "id": 9,
+    "site_short": "DELA",
+    "site_name": "Dead Lake",
+    "latitude": 32.542337,
+    "longitude": -87.806023
+  },
+  {
+    "id": 10,
+    "site_short": "DSNY",
+    "site_name": "Disney Wilderness Preserve",
+    "latitude": 28.123751,
+    "longitude": -81.434181
+  },
+  {
+    "id": 11,
+    "site_short": "GRSM",
+    "site_name": "Great Smoky Mountains National Park",
+    "latitude": 35.685448,
+    "longitude": -83.503126
+  },
+  {
+    "id": 12,
+    "site_short": "GUAN",
+    "site_name": "Guánica Forest",
+    "latitude": 17.968477,
+    "longitude": -66.863548
+  },
+  {
+    "id": 13,
+    "site_short": "HARV",
+    "site_name": "Harvard Forest & Quabbin Watershed",
+    "latitude": 42.542779,
+    "longitude": -72.172129
+  },
+  {
+    "id": 14,
+    "site_short": "HEAL",
+    "site_name": "Healy",
+    "latitude": 63.873096,
+    "longitude": -149.216481
+  },
+  {
+    "id": 15,
+    "site_short": "JERC",
+    "site_name": "The Jones Center At Ichauway",
+    "latitude": 31.195781,
+    "longitude": -84.46456
+  },
+  {
+    "id": 16,
+    "site_short": "JORN",
+    "site_name": "Jornada Experimental Range",
+    "latitude": 32.58883,
+    "longitude": -106.840722
+  },
+  {
+    "id": 17,
+    "site_short": "KONA",
+    "site_name": "Konza Prairie Agroecosystem",
+    "latitude": 39.107733,
+    "longitude": -96.612011
+  },
+  {
+    "id": 18,
+    "site_short": "KONZ",
+    "site_name": "Konza Prairie Biological Station",
+    "latitude": 39.099043,
+    "longitude": -96.565104
+  },
+  {
+    "id": 19,
+    "site_short": "LAJA",
+    "site_name": "Lajas Experimental Station",
+    "latitude": 18.021288,
+    "longitude": -67.076307
+  },
+  {
+    "id": 20,
+    "site_short": "LENO",
+    "site_name": "Lenoir Landing",
+    "latitude": 31.856801,
+    "longitude": -88.160916
+  },
+  {
+    "id": 21,
+    "site_short": "MLBS",
+    "site_name": "Mountain Lake Biological Station",
+    "latitude": 37.377352,
+    "longitude": -80.526577
+  },
+  {
+    "id": 22,
+    "site_short": "MOAB",
+    "site_name": "Moab",
+    "latitude": 38.245959,
+    "longitude": -109.391249
+  },
+  {
+    "id": 23,
+    "site_short": "NIWO",
+    "site_name": "Niwot Ridge",
+    "latitude": 40.05412,
+    "longitude": -105.585104
+  },
+  {
+    "id": 24,
+    "site_short": "NOGP",
+    "site_name": "Northern Great Plains Research Laboratory",
+    "latitude": 46.771175,
+    "longitude": -100.920032
+  },
+  {
+    "id": 25,
+    "site_short": "OAES",
+    "site_name": "Marvin Klemme Range Research Station",
+    "latitude": 35.408886,
+    "longitude": -99.056628
+  },
+  {
+    "id": 26,
+    "site_short": "ONAQ",
+    "site_name": "Onaqui",
+    "latitude": 40.17483,
+    "longitude": -112.455307
+  },
+  {
+    "id": 27,
+    "site_short": "ORNL",
+    "site_name": "Oak Ridge",
+    "latitude": 35.96397,
+    "longitude": -84.28634
+  },
+  {
+    "id": 28,
+    "site_short": "OSBS",
+    "site_name": "Ordway-Swisher Biological Station",
+    "latitude": 29.689683,
+    "longitude": -81.990336
+  },
+  {
+    "id": 29,
+    "site_short": "PUUM",
+    "site_name": "Puu Makaala Natural Area Reserve",
+    "latitude": 19.553191,
+    "longitude": -155.317284
+  },
+  {
+    "id": 30,
+    "site_short": "RMNP",
+    "site_name": "Rocky Mountains",
+    "latitude": 40.187694,
+    "longitude": -105.538245
+  },
+  {
+    "id": 31,
+    "site_short": "SCBI",
+    "site_name": "Smithsonian Conservation Biology Institute",
+    "latitude": 38.890173,
+    "longitude": -78.139772
+  },
+  {
+    "id": 32,
+    "site_short": "SERC",
+    "site_name": "Smithsonian Environmental Research Center",
+    "latitude": 38.892888,
+    "longitude": -76.560083
+  },
+  {
+    "id": 33,
+    "site_short": "SJER",
+    "site_name": "San Joaquin Experimental Range",
+    "latitude": 37.111443,
+    "longitude": -119.731488
+  },
+  {
+    "id": 34,
+    "site_short": "SOAP",
+    "site_name": "Soaproot Saddle",
+    "latitude": 37.034173,
+    "longitude": -119.255891
+  },
+  {
+    "id": 35,
+    "site_short": "SRER",
+    "site_name": "Santa Rita Experimental Range",
+    "latitude": 31.909029,
+    "longitude": -110.834197
+  },
+  {
+    "id": 36,
+    "site_short": "STEI",
+    "site_name": "Steigerwaldt-Chequamegon",
+    "latitude": 45.504874,
+    "longitude": -89.585676
+  },
+  {
+    "id": 37,
+    "site_short": "STER",
+    "site_name": "North Sterling",
+    "latitude": 40.463555,
+    "longitude": -103.031158
+  },
+  {
+    "id": 38,
+    "site_short": "TALL",
+    "site_name": "Talladega National Forest",
+    "latitude": 32.95001,
+    "longitude": -87.396452
+  },
+  {
+    "id": 39,
+    "site_short": "TEAK",
+    "site_name": "Lower Teakettle",
+    "latitude": 37.00294,
+    "longitude": -119.0081
+  },
+  {
+    "id": 40,
+    "site_short": "TOOL",
+    "site_name": "Toolik Field Station",
+    "latitude": 68.657519,
+    "longitude": -149.36731
+  },
+  {
+    "id": 41,
+    "site_short": "TREE",
+    "site_name": "Treehaven",
+    "latitude": 45.491612,
+    "longitude": -89.594391
+  },
+  {
+    "id": 42,
+    "site_short": "UKFS",
+    "site_name": "KU Field Station",
+    "latitude": 39.038574,
+    "longitude": -95.188624
+  },
+  {
+    "id": 43,
+    "site_short": "UNDE",
+    "site_name": "University of Notre Dame Environmental Research Center",
+    "latitude": 46.231968,
+    "longitude": -89.542151
+  },
+  {
+    "id": 44,
+    "site_short": "WOOD",
+    "site_name": "Chase Lake National Wildlife Refuge",
+    "latitude": 47.130209,
+    "longitude": -99.242406
+  },
+  {
+    "id": 45,
+    "site_short": "WREF",
+    "site_name": "Wind River Experimental Forest",
+    "latitude": 45.822921,
+    "longitude": -121.956541
+  },
+  {
+    "id": 46,
+    "site_short": "YELL",
+    "site_name": "Yellowstone National Park",
+    "latitude": 44.96249,
+    "longitude": -110.550272
+  }
+]
