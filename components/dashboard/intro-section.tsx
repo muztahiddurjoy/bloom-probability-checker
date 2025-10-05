@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Sparkles, Map, BarChart3, Search, Globe } from "lucide-react";
+import { Sparkles, Map, BarChart3, Search, Globe, CircleQuestionMark } from "lucide-react";
 import SearchContainer from "./search-container";
 import Link from "next/link";
 
@@ -40,6 +40,16 @@ export function IntroSection() {
               Explore Map
             </Link>
             <SearchContainer />
+            <Link
+              href="/about"
+              className={buttonVariants({
+                className:
+                  "bg-lime-500 hover:bg-lime-600 text-green-900 font-semibold shadow-lg",
+              })}
+            >
+              <CircleQuestionMark/>
+              About
+            </Link>
           </div>
         </div>
       </Card>
