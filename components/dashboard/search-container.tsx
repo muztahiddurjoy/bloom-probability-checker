@@ -11,31 +11,65 @@ import {
 import { Button, buttonVariants } from "../ui/button";
 import { Loader2, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { SearchResponse } from "./search-container.model";
 import axios from "axios";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import SearchResultAdapter from "./search-result-adapter";
 
+// Trefle API response types
+export interface TrefleSpecies {
+  id: number;
+  common_name: string | null;
+  slug: string;
+  scientific_name: string;
+  year: number | null;
+  bibliography: string | null;
+  author: string | null;
+  status: string;
+  rank: string;
+  family_common_name: string | null;
+  genus_id: number;
+  image_url: string | null;
+  synonyms: string[];
+  genus: string;
+  family: string;
+  links: {
+    self: string;
+    plant: string;
+    genus: string;
+  };
+}
+
+interface TrefleSearchResponse {
+  data: TrefleSpecies[];
+  links: {
+    self: string;
+    first: string;
+    last: string;
+  };
+  meta: {
+    total: number;
+  };
+}
+
 const SearchContainer = () => {
-  const [query, setquery] = useState<string>("");
-  const [searchResponse, setsearchResponse] = useState<SearchResponse | null>(
-    null,
-  );
-  const [loading, setloading] = useState<boolean>(false);
+  const [query, setQuery] = useState<string>("");
+  const [searchResponse, setSearchResponse] = useState<TrefleSearchResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const getFlowerData = async () => {
+    if (!query.trim()) return;
+    
     try {
-      setloading(true);
+      setLoading(true);
       const res = await axios.get(
-        `https://perenual.com/api/v2/species-list?key=sk-1IzM68e163d92f31c12679&q=${query}`,
+        `/api/trefle?q=${encodeURIComponent(query)}&limit=10`
       );
-      setsearchResponse(res.data);
+      setSearchResponse(res.data);
     } catch (err) {
-      console.log(err);
-      setsearchResponse(null);
+      console.error("Error fetching flower data:", err);
+      setSearchResponse(null);
     } finally {
-      setloading(false);
+      setLoading(false);
     }
   };
 
@@ -65,7 +99,7 @@ const SearchContainer = () => {
               <Input
                 value={query}
                 placeholder="Search Flower..."
-                onChange={(e) => setquery(e.target.value)}
+                onChange={(e) => setQuery(e.target.value)}
                 onKeyPress={handleKeyPress}
                 className="rounded-r-none border-lime-400"
               />
@@ -90,17 +124,17 @@ const SearchContainer = () => {
           <div className="mt-4">
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-semibold text-gray-700">
-                Results ({searchResponse.total})
+                Results ({searchResponse.meta.total})
               </h3>
-              <p className="text-sm text-gray-500">
-                Page {searchResponse.current_page} of {searchResponse.last_page}
-              </p>
             </div>
 
             <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-3">
-                {searchResponse.data.map((flower) => (
-                  <SearchResultAdapter key={flower.id} {...flower} />
+                {searchResponse.data.map((species) => (
+                  <SearchResultAdapter 
+                    key={species.id} 
+                    species={species}
+                  />
                 ))}
                 {searchResponse.data.length === 0 && (
                   <div className="text-center py-8 text-gray-500">
