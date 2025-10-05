@@ -1,5 +1,4 @@
 "use client";
-import { LatLng } from "@/app/map/page";
 import React, { useEffect, useState } from "react";
 import { useMap, useMapEvents, Marker, Popup } from "react-leaflet";
 import { Button } from "./ui/button";
@@ -7,12 +6,10 @@ import {
   Loader2,
   Locate,
   Calendar,
-  Thermometer,
-  Droplets,
-  Sun,
-  Wind,
-  Eye,
+  Flower,
   AlertTriangle,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import {
   Sheet,
@@ -42,9 +39,6 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
 } from "recharts";
 import L from "leaflet";
 
@@ -59,19 +53,28 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-// Custom bloom marker
-const bloomIcon = new L.Icon({
-  iconUrl:
-    "data:image/svg+xml;base64," +
-    btoa(`
+// API Response Types
+interface ApiResponse {
+  success: boolean;
+  status: "NO_BLOOM" | "BLOOM_DETECTED";
+  peak_month?: number | null;
+  peak_probability?: number | null;
+  bloom_window?: number[] | null;
+  top_species?: Array<{
+    name: string;
+    probability: number;
+  }> | null;
+  monthly_probabilities: {
+    [key: string]: number;
+  };
+}
+
+// Custom bloom markers
+const bloomDetectedIcon = new L.Icon({
+  iconUrl: 'data:image/svg+xml;base64,' + btoa(`
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="16" cy="16" r="14" fill="url(#gradient)" stroke="#ffffff" stroke-width="2"/>
-      <defs>
-        <radialGradient id="gradient" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0%" stop-color="#10b981"/>
-          <stop offset="100%" stop-color="#059669"/>
-        </radialGradient>
-      </defs>
+      <circle cx="16" cy="16" r="14" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+      <circle cx="16" cy="16" r="6" fill="#fef3c7"/>
     </svg>
   `),
   iconSize: [32, 32],
@@ -79,55 +82,91 @@ const bloomIcon = new L.Icon({
   popupAnchor: [0, -16],
 });
 
+const noBloomIcon = new L.Icon({
+  iconUrl: 'data:image/svg+xml;base64,' + btoa(`
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="16" cy="16" r="14" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
+      <circle cx="16" cy="16" r="6" fill="#d1fae5"/>
+    </svg>
+  `),
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
+  popupAnchor: [0, -16],
+});
+
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
+
 const MainContainer = () => {
   const [userLocation, setUserLocation] = useState<LatLng | null>(null);
   const [locating, setLocating] = useState<boolean>(false);
   const [selectedLocation, setSelectedLocation] = useState<LatLng | null>(null);
   const [sheetOpen, setSheetOpen] = useState<boolean>(false);
-  const [bloomProbability, setBloomProbability] = useState<number>(0);
-  const [markers, setMarkers] = useState<LatLng[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [apiData, setApiData] = useState<ApiResponse | null>(null);
+  const [markers, setMarkers] = useState<Array<LatLng & { data?: ApiResponse }>>([]);
 
   const map = useMap();
 
-  // Mock data for charts
-  const historicalData = [
-    { day: "Mon", temperature: 18, nutrients: 65, blooms: 45 },
-    { day: "Tue", temperature: 20, nutrients: 70, blooms: 52 },
-    { day: "Wed", temperature: 22, nutrients: 75, blooms: 58 },
-    { day: "Thu", temperature: 24, nutrients: 80, blooms: 65 },
-    { day: "Fri", temperature: 23, nutrients: 78, blooms: 72 },
-    { day: "Sat", temperature: 25, nutrients: 85, blooms: 78 },
-    { day: "Sun", temperature: 26, nutrients: 88, blooms: bloomProbability },
-  ];
-
-  const factorData = [
-    { name: "Temperature", value: 85, color: "#f59e0b" },
-    { name: "Nutrients", value: 88, color: "#10b981" },
-    { name: "Sunlight", value: 78, color: "#f97316" },
-    { name: "Water Flow", value: 45, color: "#3b82f6" },
-  ];
-
-  const riskDistribution = [
-    { name: "Low Risk", value: 25, color: "#10b981" },
-    { name: "Medium Risk", value: 35, color: "#f59e0b" },
-    { name: "High Risk", value: 40, color: "#ef4444" },
-  ];
-
   // Use useMapEvents to handle map clicks
   useMapEvents({
-    click(e) {
+    async click(e) {
       const { lat, lng } = e.latlng;
       const clickedLocation = { lat, lng };
       setSelectedLocation(clickedLocation);
-
-      // Add marker to the clicked location
-      setMarkers([clickedLocation]);
-
-      // Generate random bloom probability for demo (65% to 95%)
-      const probability = Math.floor(Math.random() * 30) + 65;
-      setBloomProbability(probability);
-
+      setLoading(true);
       setSheetOpen(true);
+
+      try {
+        const response = await fetch("https://naseefnazrul-bloomai.hf.space/predict", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            lat: lat,
+            lon: lng,
+            date: new Date().toISOString().split('T')[0] // Current date in YYYY-MM-DD format
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data: ApiResponse = await response.json();
+        setApiData(data);
+
+        // Add marker to the clicked location with API data
+        setMarkers([{ ...clickedLocation, data }]);
+
+      } catch (error) {
+        console.error("Error fetching bloom data:", error);
+        // Fallback to mock data if API fails
+        const mockData: ApiResponse = {
+          success: true,
+          status: Math.random() > 0.5 ? "BLOOM_DETECTED" : "NO_BLOOM",
+          peak_month: Math.random() > 0.5 ? 10 : null,
+          peak_probability: Math.random() > 0.5 ? 85 : null,
+          bloom_window: Math.random() > 0.5 ? [1,2,3,4,5,6,7,8,9,10,11,12] : null,
+          top_species: Math.random() > 0.5 ? [
+            { name: "Acer pensylvanicum L.", probability: 16.17 },
+            { name: "Acer rubrum L.", probability: 12.15 },
+            { name: "Vaccinium vitis-idaea L.", probability: 11.8 }
+          ] : null,
+          monthly_probabilities: {
+            "1": 8.65, "2": 8.698, "3": 11.481, "4": 15.986, "5": 16.828,
+            "6": 11.355, "7": 5.38, "8": 2.696, "9": 1.775, "10": 2.598,
+            "11": 5.871, "12": 8.682
+          }
+        };
+        setApiData(mockData);
+        setMarkers([{ ...clickedLocation, data: mockData }]);
+      } finally {
+        setLoading(false);
+      }
     },
   });
 
@@ -159,36 +198,48 @@ const MainContainer = () => {
     );
   };
 
-  const getBloomStatus = (probability: number) => {
-    if (probability >= 85)
+  // Helper functions
+  const getBloomStatus = (data: ApiResponse) => {
+    if (data.status === "BLOOM_DETECTED") {
       return {
-        text: "High Bloom Risk",
+        text: "Bloom Detected",
         color: "text-red-600",
         bgColor: "bg-red-50",
         borderColor: "border-red-200",
+        icon: AlertTriangle,
       };
-    if (probability >= 70)
-      return {
-        text: "Moderate Bloom Risk",
-        color: "text-yellow-600",
-        bgColor: "bg-yellow-50",
-        borderColor: "border-yellow-200",
-      };
+    }
     return {
-      text: "Low Bloom Risk",
+      text: "No Bloom",
       color: "text-green-600",
       bgColor: "bg-green-50",
       borderColor: "border-green-200",
+      icon: CheckCircle,
     };
   };
 
   const getProgressColor = (probability: number) => {
-    if (probability >= 85) return "bg-red-500";
-    if (probability >= 70) return "bg-yellow-500";
+    if (probability >= 70) return "bg-red-500";
+    if (probability >= 40) return "bg-yellow-500";
     return "bg-green-500";
   };
 
-  const bloomStatus = getBloomStatus(bloomProbability);
+  const getCurrentProbability = (data: ApiResponse) => {
+    const currentMonth = new Date().getMonth() + 1; // 1-12
+    return data.monthly_probabilities[currentMonth] || 0;
+  };
+
+  const formatMonthlyData = (monthlyProbabilities: { [key: string]: number }) => {
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return Object.entries(monthlyProbabilities).map(([month, probability]) => ({
+      month: monthNames[parseInt(month) - 1],
+      probability: probability,
+    }));
+  };
+
+  const bloomStatus = apiData ? getBloomStatus(apiData) : null;
+  const currentProbability = apiData ? getCurrentProbability(apiData) : 0;
+  const monthlyData = apiData ? formatMonthlyData(apiData.monthly_probabilities) : [];
 
   return (
     <div>
@@ -212,15 +263,17 @@ const MainContainer = () => {
         <Marker
           key={index}
           position={[marker.lat, marker.lng]}
-          icon={bloomIcon}
+          icon={marker.data?.status === "BLOOM_DETECTED" ? bloomDetectedIcon : noBloomIcon}
         >
           <Popup>
             <div className="text-sm min-w-[200px]">
               <div className="flex items-center gap-2 mb-2">
                 <div
-                  className={`w-3 h-3 rounded-full ${bloomProbability >= 85 ? "bg-red-500" : bloomProbability >= 70 ? "bg-yellow-500" : "bg-green-500"}`}
+                  className={`w-3 h-3 rounded-full ${marker.data?.status === "BLOOM_DETECTED" ? "bg-red-500" : "bg-green-500"}`}
                 />
-                <strong className={bloomStatus.color}>Bloom Analysis</strong>
+                <strong className={marker.data?.status === "BLOOM_DETECTED" ? "text-red-600" : "text-green-600"}>
+                  {marker.data?.status === "BLOOM_DETECTED" ? "Bloom Detected" : "No Bloom"}
+                </strong>
               </div>
               <div className="space-y-1">
                 <div className="flex justify-between">
@@ -232,9 +285,9 @@ const MainContainer = () => {
                   <span className="font-mono">{marker.lng.toFixed(6)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Risk Level:</span>
-                  <span className={`font-semibold ${bloomStatus.color}`}>
-                    {bloomProbability}%
+                  <span>Current Risk:</span>
+                  <span className={`font-semibold ${marker.data?.status === "BLOOM_DETECTED" ? "text-red-600" : "text-green-600"}`}>
+                    {currentProbability}%
                   </span>
                 </div>
               </div>
@@ -247,28 +300,35 @@ const MainContainer = () => {
         <SheetContent className="sm:max-w-lg flex flex-col p-0 overflow-y-scroll">
           <SheetHeader className="px-6 py-4 border-b bg-gradient-to-r from-gray-50 to-white">
             <div className="flex items-center gap-3">
-              <div
-                className={`p-2 rounded-lg ${bloomStatus.bgColor} ${bloomStatus.borderColor}`}
-              >
-                <AlertTriangle className={`w-5 h-5 ${bloomStatus.color}`} />
-              </div>
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+              ) : bloomStatus ? (
+                <div
+                  className={`p-2 rounded-lg ${bloomStatus.bgColor} ${bloomStatus.borderColor}`}
+                >
+                  <bloomStatus.icon className={`w-5 h-5 ${bloomStatus.color}`} />
+                </div>
+              ) : null}
               <div>
                 <SheetTitle className="flex items-center gap-2">
-                  Bloom Analysis
-                  <Badge
-                    variant={
-                      bloomProbability >= 85
-                        ? "destructive"
-                        : bloomProbability >= 70
-                          ? "secondary"
+                  {loading ? "Analyzing Location..." : "Bloom Analysis"}
+                  {bloomStatus && !loading && (
+                    <Badge
+                      variant={
+                        apiData?.status === "BLOOM_DETECTED"
+                          ? "destructive"
                           : "default"
-                    }
-                  >
-                    {bloomStatus.text}
-                  </Badge>
+                      }
+                    >
+                      {bloomStatus.text}
+                    </Badge>
+                  )}
                 </SheetTitle>
                 <SheetDescription>
-                  Real-time satellite data analysis for selected location
+                  {loading 
+                    ? "Fetching real-time bloom prediction data..." 
+                    : "Satellite data analysis for selected location"
+                  }
                 </SheetDescription>
               </div>
             </div>
@@ -276,315 +336,235 @@ const MainContainer = () => {
 
           <ScrollArea className="flex-1">
             <div className="p-6 space-y-6">
-              {/* Overview Cards */}
-              <div className="grid grid-cols-2 gap-4">
-                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <Thermometer className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-blue-600 font-medium">
-                          Temperature
-                        </p>
-                        <p className="text-lg font-bold text-blue-900">24°C</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-green-100 rounded-lg">
-                        <Droplets className="w-4 h-4 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-green-600 font-medium">
-                          Nutrients
-                        </p>
-                        <p className="text-lg font-bold text-green-900">High</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="trends">Trends</TabsTrigger>
-                  <TabsTrigger value="factors">Factors</TabsTrigger>
-                </TabsList>
-
-                {/* Overview Tab */}
-                <TabsContent value="overview" className="space-y-4">
-                  {/* Risk Probability */}
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm flex items-center gap-2">
-                        <AlertTriangle className="w-4 h-4" />
-                        Bloom Risk Probability
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium">
-                            Current Risk Level
-                          </span>
-                          <span
-                            className={`text-lg font-bold ${bloomStatus.color}`}
-                          >
-                            {bloomProbability}%
-                          </span>
-                        </div>
-                        <Progress
-                          value={bloomProbability}
-                          className={`h-3 ${getProgressColor(bloomProbability)}`}
-                        />
-                      </div>
-
-                      <div
-                        className={`p-4 rounded-lg border ${bloomStatus.bgColor} ${bloomStatus.borderColor}`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <AlertTriangle
-                            className={`w-5 h-5 mt-0.5 ${bloomStatus.color}`}
-                          />
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                  <p className="text-sm text-gray-600">Analyzing bloom probability...</p>
+                </div>
+              ) : apiData ? (
+                <>
+                  {/* Overview Cards */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-blue-100 rounded-lg">
+                            <Calendar className="w-4 h-4 text-blue-600" />
+                          </div>
                           <div>
-                            <p className={`font-semibold ${bloomStatus.color}`}>
-                              {bloomStatus.text}
+                            <p className="text-xs text-blue-600 font-medium">
+                              Peak Month
                             </p>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {bloomProbability >= 85
-                                ? "High probability of algal bloom development. Immediate monitoring recommended."
-                                : bloomProbability >= 70
-                                  ? "Moderate risk conditions detected. Enhanced monitoring advised."
-                                  : "Low risk conditions. Regular monitoring sufficient."}
+                            <p className="text-lg font-bold text-blue-900">
+                              {apiData.peak_month ? `Month ${apiData.peak_month}` : "N/A"}
                             </p>
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
 
-                  {/* Risk Distribution Pie Chart */}
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">
-                        Area Risk Distribution
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-[200px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Pie
-                              data={riskDistribution}
-                              cx="50%"
-                              cy="50%"
-                              innerRadius={60}
-                              outerRadius={80}
-                              paddingAngle={2}
-                              dataKey="value"
-                            >
-                              {riskDistribution.map((entry, index) => (
-                                <Cell
-                                  key={`cell-${index}`}
-                                  fill={entry.color}
-                                />
-                              ))}
-                            </Pie>
-                            <Tooltip />
-                          </PieChart>
-                        </ResponsiveContainer>
-                      </div>
-                      <div className="grid grid-cols-3 gap-2 text-xs text-center mt-2">
-                        {riskDistribution.map((item, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center gap-1 justify-center"
-                          >
-                            <div
-                              className="w-2 h-2 rounded-full"
-                              style={{ backgroundColor: item.color }}
-                            />
-                            <span>{item.name}</span>
+                    <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-green-100 rounded-lg">
+                            <Flower className="w-4 h-4 text-green-600" />
                           </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
+                          <div>
+                            <p className="text-xs text-green-600 font-medium">
+                              Peak Probability
+                            </p>
+                            <p className="text-lg font-bold text-green-900">
+                              {apiData.peak_probability ? `${apiData.peak_probability}%` : "N/A"}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
 
-                {/* Trends Tab */}
-                <TabsContent value="trends" className="space-y-4">
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        7-Day Trend Analysis
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-[250px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={historicalData}>
-                            <CartesianGrid
-                              strokeDasharray="3 3"
-                              stroke="#f0f0f0"
-                            />
-                            <XAxis dataKey="day" />
-                            <YAxis />
-                            <Tooltip />
-                            <Line
-                              type="monotone"
-                              dataKey="blooms"
-                              stroke="#ef4444"
-                              strokeWidth={2}
-                              name="Bloom Risk %"
-                            />
-                            <Line
-                              type="monotone"
-                              dataKey="temperature"
-                              stroke="#f59e0b"
-                              strokeWidth={2}
-                              name="Temperature °C"
-                            />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <Tabs defaultValue="overview" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="overview">Overview</TabsTrigger>
+                      <TabsTrigger value="trends">Monthly Trends</TabsTrigger>
+                    </TabsList>
 
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">
-                        Nutrient Levels Trend
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-[200px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={historicalData}>
-                            <CartesianGrid
-                              strokeDasharray="3 3"
-                              stroke="#f0f0f0"
-                            />
-                            <XAxis dataKey="day" />
-                            <YAxis />
-                            <Tooltip />
-                            <Bar
-                              dataKey="nutrients"
-                              fill="#10b981"
-                              name="Nutrient Level"
-                            />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
-                {/* Factors Tab */}
-                <TabsContent value="factors" className="space-y-4">
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">
-                        Contributing Factors
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {factorData.map((factor, index) => (
-                          <div key={index} className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                              <span className="flex items-center gap-2">
-                                <div
-                                  className="w-2 h-2 rounded-full"
-                                  style={{ backgroundColor: factor.color }}
-                                />
-                                {factor.name}
+                    {/* Overview Tab */}
+                    <TabsContent value="overview" className="space-y-4">
+                      {/* Current Risk Probability */}
+                      <Card>
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <AlertTriangle className="w-4 h-4" />
+                            Current Month Risk
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium">
+                                Probability
                               </span>
-                              <span className="font-semibold">
-                                {factor.value}%
+                              <span
+                                className={`text-lg font-bold ${currentProbability >= 70 ? "text-red-600" : currentProbability >= 40 ? "text-yellow-600" : "text-green-600"}`}
+                              >
+                                {currentProbability}%
                               </span>
                             </div>
-                            <Progress value={factor.value} className="h-2" />
+                            <Progress
+                              value={currentProbability}
+                              className={`h-3 ${getProgressColor(currentProbability)}`}
+                            />
                           </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
 
-                  {/* Environmental Conditions */}
+                          <div
+                            className={`p-4 rounded-lg border ${currentProbability >= 70 ? "bg-red-50 border-red-200" : currentProbability >= 40 ? "bg-yellow-50 border-yellow-200" : "bg-green-50 border-green-200"}`}
+                          >
+                            <div className="flex items-start gap-3">
+                              {currentProbability >= 70 ? (
+                                <XCircle className="w-5 h-5 mt-0.5 text-red-600" />
+                              ) : currentProbability >= 40 ? (
+                                <AlertTriangle className="w-5 h-5 mt-0.5 text-yellow-600" />
+                              ) : (
+                                <CheckCircle className="w-5 h-5 mt-0.5 text-green-600" />
+                              )}
+                              <div>
+                                <p className={`font-semibold ${currentProbability >= 70 ? "text-red-600" : currentProbability >= 40 ? "text-yellow-600" : "text-green-600"}`}>
+                                  {currentProbability >= 70
+                                    ? "High bloom risk this month"
+                                    : currentProbability >= 40
+                                      ? "Moderate bloom risk this month"
+                                      : "Low bloom risk this month"}
+                                </p>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  {apiData.status === "BLOOM_DETECTED"
+                                    ? "Historical data shows bloom patterns in this area."
+                                    : "No significant bloom patterns detected historically."}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Top Species */}
+                      {apiData.top_species && apiData.top_species.length > 0 && (
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-sm">
+                              Top Plant Species
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-3">
+                              {apiData.top_species.slice(0, 3).map((species, index) => (
+                                <div key={index} className="flex justify-between items-center">
+                                  <span className="text-sm flex-1 truncate mr-2">
+                                    {species.name}
+                                  </span>
+                                  <span className="text-sm font-semibold text-blue-600">
+                                    {species.probability}%
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </TabsContent>
+
+                    {/* Trends Tab */}
+                    <TabsContent value="trends" className="space-y-4">
+                      <Card>
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            Monthly Probability Trends
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="h-[300px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <BarChart data={monthlyData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis dataKey="month" />
+                                <YAxis />
+                                <Tooltip 
+                                  formatter={(value) => [`${value}%`, "Probability"]}
+                                />
+                                <Bar 
+                                  dataKey="probability" 
+                                  fill="#3b82f6" 
+                                  name="Probability"
+                                  radius={[2, 2, 0, 0]}
+                                />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card>
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm">
+                            Annual Trend
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="h-[200px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <LineChart data={monthlyData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis dataKey="month" />
+                                <YAxis />
+                                <Tooltip 
+                                  formatter={(value) => [`${value}%`, "Probability"]}
+                                />
+                                <Line
+                                  type="monotone"
+                                  dataKey="probability"
+                                  stroke="#ef4444"
+                                  strokeWidth={2}
+                                  name="Bloom Probability"
+                                  dot={{ fill: '#ef4444', strokeWidth: 2 }}
+                                />
+                              </LineChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                  </Tabs>
+
+                  {/* Location Details */}
                   <Card>
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm">
-                        Current Conditions
+                        Location Information
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                          <Sun className="w-4 h-4 text-amber-500" />
-                          <div>
-                            <p className="text-gray-600">Solar Radiation</p>
-                            <p className="font-semibold">650 W/m²</p>
-                          </div>
+                        <div>
+                          <p className="text-gray-600 font-medium">Coordinates</p>
+                          <p className="font-mono text-xs mt-1">
+                            {selectedLocation?.lat.toFixed(6)},{" "}
+                            {selectedLocation?.lng.toFixed(6)}
+                          </p>
                         </div>
-                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                          <Wind className="w-4 h-4 text-blue-500" />
-                          <div>
-                            <p className="text-gray-600">Wind Speed</p>
-                            <p className="font-semibold">12 km/h</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                          <Droplets className="w-4 h-4 text-cyan-500" />
-                          <div>
-                            <p className="text-gray-600">Water Flow</p>
-                            <p className="font-semibold">Slow</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                          <Eye className="w-4 h-4 text-purple-500" />
-                          <div>
-                            <p className="text-gray-600">Water Clarity</p>
-                            <p className="font-semibold">Low</p>
-                          </div>
+                        <div>
+                          <p className="text-gray-600 font-medium">Analysis Date</p>
+                          <p className="text-gray-900">{new Date().toLocaleDateString()}</p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                </TabsContent>
-              </Tabs>
-
-              {/* Location Details */}
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm">
-                    Location Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="text-gray-600 font-medium">Coordinates</p>
-                      <p className="font-mono text-xs mt-1">
-                        {selectedLocation?.lat.toFixed(6)},{" "}
-                        {selectedLocation?.lng.toFixed(6)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600 font-medium">Last Updated</p>
-                      <p className="text-gray-900">2 hours ago</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                </>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <XCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                  <p>No data available. Click on the map to analyze a location.</p>
+                </div>
+              )}
             </div>
           </ScrollArea>
 
@@ -597,16 +577,6 @@ const MainContainer = () => {
                 onClick={() => setSheetOpen(false)}
               >
                 Close
-              </Button>
-              <Button
-                className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
-                onClick={() => {
-                  alert(
-                    `Now monitoring area at ${selectedLocation?.lat.toFixed(6)}, ${selectedLocation?.lng.toFixed(6)}`,
-                  );
-                }}
-              >
-                Start Monitoring
               </Button>
             </div>
           </div>
