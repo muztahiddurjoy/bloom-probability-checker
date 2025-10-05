@@ -5,9 +5,8 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Business Management App",
-  description: "Next.js app for business management",
-  generator: "v0.app",
+  title: "Bloom Tracker",
+  description: "Next.js app for bloom tracking",
 };
 
 export default function RootLayout({
